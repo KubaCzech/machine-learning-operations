@@ -1,0 +1,13 @@
+# Baseline: "sensible defaults" without any tuning or regularisation.
+batch_size: 128
+augment: false
+width: 32
+blocks_per_stage: 1
+dropout: 0.0
+optimizer: adamw
+lr: 0.001
+weight_decay: 0.0
+scheduler: none
+label_smoothing: 0.0
+max_epochs: 20
+seed: 42

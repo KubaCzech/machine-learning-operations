@@ -1,0 +1,51 @@
+{
+  "run_name": "manual_fix",
+  "config": {
+    "batch_size": 128,
+    "val_size": 5000,
+    "augment": true,
+    "num_workers": 0,
+    "width": 32,
+    "blocks_per_stage": 1,
+    "dropout": 0.0,
+    "optimizer": "adamw",
+    "lr": 0.001,
+    "weight_decay": 0.0005,
+    "momentum": 0.9,
+    "scheduler": "cosine",
+    "label_smoothing": 0.0,
+    "max_epochs": 20,
+    "seed": 42,
+    "limit_train_batches": 1.0,
+    "limit_val_batches": 1.0
+  },
+  "best_val_f1": 0.8644452095031738,
+  "best_epoch": 17,
+  "epochs_run": 20,
+  "train_time_s": 208.85031112493016,
+  "n_params": 308650,
+  "mlflow_run_id": "93494d655bee4a708ab4998d2d8f21a6",
+  "val": {
+    "val_loss": 0.41907334327697754,
+    "val_acc": 0.8641999959945679,
+    "val_f1": 0.8644452095031738
+  },
+  "test": {
+    "test_loss": 0.4233950078487396,
+    "test_acc": 0.8547999858856201,
+    "test_f1": 0.854577898979187
+  },
+  "test_per_class_f1": [
+    0.8609731876861966,
+    0.9325955734406438,
+    0.7863335033146354,
+    0.7296094908551656,
+    0.8352300841167739,
+    0.7897435897435897,
+    0.8860384805130735,
+    0.8865248226950354,
+    0.9239940387481371,
+    0.9147363233119763
+  ],
+  "checkpoint": "models/lab1/manual_fix/best.ckpt"
+}

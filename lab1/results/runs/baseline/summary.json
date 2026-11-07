@@ -1,0 +1,51 @@
+{
+  "run_name": "baseline",
+  "config": {
+    "batch_size": 128,
+    "val_size": 5000,
+    "augment": false,
+    "num_workers": 0,
+    "width": 32,
+    "blocks_per_stage": 1,
+    "dropout": 0.0,
+    "optimizer": "adamw",
+    "lr": 0.001,
+    "weight_decay": 0.0,
+    "momentum": 0.9,
+    "scheduler": "none",
+    "label_smoothing": 0.0,
+    "max_epochs": 20,
+    "seed": 42,
+    "limit_train_batches": 1.0,
+    "limit_val_batches": 1.0
+  },
+  "best_val_f1": 0.7788491249084473,
+  "best_epoch": 11,
+  "epochs_run": 20,
+  "train_time_s": 205.87986562494189,
+  "n_params": 308650,
+  "mlflow_run_id": "4c067c7efcfb43488191b919047a806d",
+  "val": {
+    "val_loss": 0.6935796141624451,
+    "val_acc": 0.777999997138977,
+    "val_f1": 0.7788491249084473
+  },
+  "test": {
+    "test_loss": 0.71844482421875,
+    "test_acc": 0.7785999774932861,
+    "test_f1": 0.7792924642562866
+  },
+  "test_per_class_f1": [
+    0.8056365403304179,
+    0.8841201716738197,
+    0.6781661370857921,
+    0.6475644699140402,
+    0.7520814061054579,
+    0.6872852233676976,
+    0.8217967599410898,
+    0.7910364145658263,
+    0.8866699950074888,
+    0.8385674931129476
+  ],
+  "checkpoint": "models/lab1/baseline/best.ckpt"
+}

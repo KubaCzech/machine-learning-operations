@@ -1,0 +1,6 @@
+# Manual change motivated by the baseline curves (train loss -> 0, val loss
+# rising after a few epochs = overfitting): add augmentation, weight decay
+# and a cosine LR schedule. Applied on top of baseline.yaml.
+augment: true
+weight_decay: 0.0005
+scheduler: cosine

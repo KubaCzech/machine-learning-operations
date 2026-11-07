@@ -1,0 +1,67 @@
+{
+  "checkpoint": "best.ckpt",
+  "load": "from src.model import CIFAR10Classifier; CIFAR10Classifier.load_from_checkpoint(path)",
+  "source": "lab1/src/model.py",
+  "classes": [
+    "airplane",
+    "automobile",
+    "bird",
+    "cat",
+    "deer",
+    "dog",
+    "frog",
+    "horse",
+    "ship",
+    "truck"
+  ],
+  "input": {
+    "shape": [
+      3,
+      32,
+      32
+    ],
+    "normalize_mean": [
+      0.4914,
+      0.4822,
+      0.4465
+    ],
+    "normalize_std": [
+      0.247,
+      0.2435,
+      0.2616
+    ]
+  },
+  "config": {
+    "batch_size": 128,
+    "val_size": 5000,
+    "augment": true,
+    "num_workers": 0,
+    "width": 48,
+    "blocks_per_stage": 1,
+    "dropout": 0.06101911742238941,
+    "optimizer": "adamw",
+    "lr": 0.00869299151113955,
+    "weight_decay": 5.762487216478604e-05,
+    "momentum": 0.9,
+    "scheduler": "onecycle",
+    "label_smoothing": 0.09903538202225404,
+    "max_epochs": 20,
+    "seed": 42,
+    "limit_train_batches": 1.0,
+    "limit_val_batches": 1.0
+  },
+  "best_val_f1": 0.9092200994491577,
+  "best_epoch": 19,
+  "n_params": 691834,
+  "mlflow_run_id": "9b32a7d80b124b4da52bfa1fc9c126a8",
+  "val": {
+    "val_loss": 0.3387444317340851,
+    "val_acc": 0.9089999794960022,
+    "val_f1": 0.9092200994491577
+  },
+  "test": {
+    "test_loss": 0.3459157645702362,
+    "test_acc": 0.9072999954223633,
+    "test_f1": 0.9071549773216248
+  }
+}

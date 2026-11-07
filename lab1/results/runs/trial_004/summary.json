@@ -1,0 +1,28 @@
+{
+  "run_name": "trial_004",
+  "config": {
+    "batch_size": 128,
+    "val_size": 5000,
+    "augment": true,
+    "num_workers": 0,
+    "width": 48,
+    "blocks_per_stage": 1,
+    "dropout": 0.0979914312095726,
+    "optimizer": "sgd",
+    "lr": 0.15308837415731386,
+    "weight_decay": 2.259279742015697e-06,
+    "momentum": 0.9,
+    "scheduler": "onecycle",
+    "label_smoothing": 0.009045457782107613,
+    "max_epochs": 10,
+    "seed": 42,
+    "limit_train_batches": 1.0,
+    "limit_val_batches": 1.0
+  },
+  "best_val_f1": 0.8753600120544434,
+  "best_epoch": 9,
+  "epochs_run": 10,
+  "train_time_s": 204.1703831248451,
+  "n_params": 691834,
+  "mlflow_run_id": "49620312e0a54c329ea89b0aadd287e4"
+}

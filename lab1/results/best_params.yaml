@@ -1,0 +1,9 @@
+augment: true
+batch_size: 128
+dropout: 0.06101911742238941
+label_smoothing: 0.09903538202225404
+lr: 0.00869299151113955
+optimizer: adamw
+scheduler: onecycle
+weight_decay: 5.762487216478604e-05
+width: 48
