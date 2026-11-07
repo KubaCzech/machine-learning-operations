@@ -221,3 +221,6 @@ __marimo__/
 
 # macOS files
 .DS_STORE
+
+# shared datasets (downloaded automatically by the labs)
+/data/
