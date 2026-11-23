@@ -12,6 +12,79 @@ REST API with **two** tools and benchmarked with and without batching:
 
 Results: [`results/results.md`](results/results.md) (tables) and the plots in [`results/`](results/).
 
+## Presentation (5 min): plan and what we say
+
+| # | Point | Time | Where in this file |
+|---|---|---|---|
+| 1 | Model and task, tools and why | 0:30 | below + [Why…](#why-best-mps-and-these-two-tools) |
+| 2 | Code: where batching is configured | 0:30 | below |
+| 3 | Live request | 0:30 | below + [Example request](#example-request-live) |
+| 4 | Question to the audience, then the comparison table | 0:45 | [The four configurations side by side](#the-four-configurations-side-by-side) |
+| 5 | The knee | 0:30 | [The knee](#the-knee-concurrency-1128) |
+| 6 | The bottleneck | 0:45 | [Who is the bottleneck?](#who-is-the-bottleneck) |
+| 7 | Dynamic vs adaptive + hysteresis | 0:45 | [Dynamic vs adaptive batching](#dynamic-ray-serve-vs-adaptive-bentoml-batching) |
+| 8 | Production recommendation | 0:20 | [Production recommendation](#production-recommendation) |
+| 9 | Problems + one-sentence takeaway | 0:25 | [Problems](#problems-worth-knowing-about) + below |
+
+**1. Model and task (a reminder from HW1).** CIFAR-10 image classification: 10 classes, 32×32 colour images. The model is
+a small ResNet in PyTorch Lightning, with hyperparameters tuned by Optuna (`models/lab1/best`). It has 692k parameters
+and 90.73% test accuracy. For serving it is exported to TorchScript (`export_model.py`), with normalisation and
+softmax inside, so the server receives raw image bytes. Accuracy after export is unchanged.
+Tools: **BentoML** (adaptive batching) and **Ray Serve** (dynamic batching with a fixed window). They show the
+difference between the two kinds of batching well, and both run natively on a Mac with GPU access (MPS).
+Triton runs on a Mac only in Docker, without the GPU.
+
+**2. Where batching is configured.** The model and the shared code (`common.py`) are identical for both tools; only
+this part differs.
+
+BentoML ([`service.py`](service.py)): one decorator; the dispatcher assembles the batch by itself.
+
+```python
+batching_options = (
+    {"batchable": True, "batch_dim": 0, "max_batch_size": MAX_BATCH_SIZE, "max_latency_ms": MAX_LATENCY_MS}
+    if BATCHING
+    else {"batchable": False}
+)
+
+@bentoml.api(**batching_options)
+def predict(self, images: list[str]) -> list[dict]:
+    # with batching on, `images` is the concatenation of the lists of many requests
+    return self.runner.predict(images)
+```
+
+Ray Serve ([`ray_app.py`](ray_app.py)): `@serve.batch` hands us a list of requests, and we split the results back ourselves.
+
+```python
+@serve.batch(max_batch_size=MAX_BATCH_SIZE, batch_wait_timeout_s=BATCH_WAIT_MS / 1000)
+async def _predict_batched(self, requests: list[list[str]]) -> list[list[dict]]:
+    flat = [image for images in requests for image in images]
+    predictions = await self._run(flat)
+    ...  # split predictions back, one list per request
+```
+
+Parameters: `max_batch_size=64` in both; BentoML `max_latency_ms=1000` (a latency budget, not a window); Ray Serve
+a 5 ms window.
+
+**3. Live request** (start the server in a separate terminal before the talk):
+
+```bash
+cd lab2 && source .venv/bin/activate
+BATCHING=1 bentoml serve service:CifarClassifier --port 3111          # terminal 1, starts in ~10 s
+
+curl -s -X POST http://127.0.0.1:3111/predict \
+     -H 'content-type: application/json' -d @sample_request.json      # terminal 2
+# [{"label": "cat", "class_id": 3, "confidence": 0.9572}]
+python client_example.py                                              # 8 test-set images
+```
+
+**4. Question to the audience before showing the table:** "Which tool won, and how much did batching help: 1.5×, 3× or 10×?"
+Answer: BentoML; batching gave 3.5× in BentoML and 1.9× in Ray Serve. The bare model on the GPU would give ~20× (batch 64 vs 1),
+but HTTP and Python overhead eat the rest (point 6).
+
+**9. One-sentence takeaway:** *Before you turn on batching, measure where the time goes. Here batching gave 3.5×
+because a model call on the GPU costs almost the same whatever the batch size. Beyond that the limit is the Python
+process handling HTTP, not the GPU. The next step is more replicas, not bigger batches.*
+
 ## Why `best`, MPS and these two tools
 
 * **The `best` model** is the most accurate of the three HW1 models (90.7% vs 85.5% and 77.9%) and the largest

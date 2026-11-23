@@ -12,6 +12,79 @@ jest wystawiony jako REST API w **dwóch** narzędziach i zmierzony z batchowani
 
 Wyniki: [`results/results.md`](results/results.md) (tabele) i wykresy w [`results/`](results/).
 
+## Prezentacja (5 min): plan i co mówimy
+
+| # | Punkt | Czas | Gdzie w tym pliku |
+|---|---|---|---|
+| 1 | Model i zadanie, narzędzia i dlaczego | 0:30 | niżej + [Dlaczego…](#dlaczego-best-mps-i-te-dwa-narzędzia) |
+| 2 | Kod: gdzie jest batchowanie | 0:30 | niżej |
+| 3 | Żądanie na żywo | 0:30 | niżej + [Przykładowe żądanie](#przykładowe-żądanie-na-żywo) |
+| 4 | Pytanie do sali, potem tabela porównawcza | 0:45 | [Cztery konfiguracje obok siebie](#cztery-konfiguracje-obok-siebie) |
+| 5 | Kolano | 0:30 | [Kolano](#kolano-współbieżność-1128) |
+| 6 | Wąskie gardło | 0:45 | [Kto jest wąskim gardłem?](#kto-jest-wąskim-gardłem) |
+| 7 | Dynamiczne vs adaptacyjne + histereza | 0:45 | [Batchowanie dynamiczne vs adaptacyjne](#batchowanie-dynamiczne-ray-serve-vs-adaptacyjne-bentoml) |
+| 8 | Rekomendacja produkcyjna | 0:20 | [Rekomendacja produkcyjna](#rekomendacja-produkcyjna) |
+| 9 | Problemy + wniosek w jednym zdaniu | 0:25 | [Problemy](#problemy-które-warto-znać) + niżej |
+
+**1. Model i zadanie (przypomnienie z HW1).** Klasyfikacja obrazów CIFAR-10: 10 klas, kolorowe obrazki 32×32. Model to
+mały ResNet w PyTorch Lightning, z hiperparametrami dobranymi przez Optunę (`models/lab1/best`). Ma 692 tys. parametrów
+i 90,73% dokładności na zbiorze testowym. Do serwowania eksportujemy go do TorchScript (`export_model.py`), z
+normalizacją i softmaxem w środku, więc serwer dostaje surowe bajty obrazka. Dokładność po eksporcie jest taka sama.
+Narzędzia: **BentoML** (batchowanie adaptacyjne) i **Ray Serve** (dynamiczne ze stałym oknem). Wybrałem je, bo
+dobrze pokazują różnicę między tymi dwoma rodzajami batchowania, a oba działają natywnie na Macu z GPU (MPS).
+Triton na Macu działa tylko w Dockerze, bez GPU.
+
+**2. Gdzie jest batchowanie w kodzie.** Model i kod wspólny (`common.py`) są takie same dla obu narzędzi; różni je
+tylko ten fragment.
+
+BentoML ([`service.py`](service.py)): jeden dekorator; dyspozytor sam składa żądania w paczkę.
+
+```python
+batching_options = (
+    {"batchable": True, "batch_dim": 0, "max_batch_size": MAX_BATCH_SIZE, "max_latency_ms": MAX_LATENCY_MS}
+    if BATCHING
+    else {"batchable": False}
+)
+
+@bentoml.api(**batching_options)
+def predict(self, images: list[str]) -> list[dict]:
+    # with batching on, `images` is the concatenation of the lists of many requests
+    return self.runner.predict(images)
+```
+
+Ray Serve ([`ray_app.py`](ray_app.py)): `@serve.batch` daje listę żądań, a podział wyników z powrotem robimy sami.
+
+```python
+@serve.batch(max_batch_size=MAX_BATCH_SIZE, batch_wait_timeout_s=BATCH_WAIT_MS / 1000)
+async def _predict_batched(self, requests: list[list[str]]) -> list[list[dict]]:
+    flat = [image for images in requests for image in images]
+    predictions = await self._run(flat)
+    ...  # split predictions back, one list per request
+```
+
+Parametry: `max_batch_size=64` w obu; BentoML `max_latency_ms=1000` (to budżet opóźnienia, nie okno); Ray Serve
+okno 5 ms.
+
+**3. Żądanie na żywo** (przed prezentacją uruchom serwer w osobnym terminalu):
+
+```bash
+cd lab2 && source .venv/bin/activate
+BATCHING=1 bentoml serve service:CifarClassifier --port 3111          # terminal 1, start ~10 s
+
+curl -s -X POST http://127.0.0.1:3111/predict \
+     -H 'content-type: application/json' -d @sample_request.json      # terminal 2
+# [{"label": "cat", "class_id": 3, "confidence": 0.9572}]
+python client_example.py                                              # 8 obrazków ze zbioru testowego
+```
+
+**4. Pytanie do sali przed pokazaniem tabeli:** „Które narzędzie wygrało i ile dało batchowanie: 1,5×, 3× czy 10×?".
+Odpowiedź: BentoML; batchowanie dało 3,5× w BentoML i 1,9× w Ray Serve. Sam model na GPU dałby ~20× (paczka 64 vs 1),
+ale resztę zjada narzut HTTP i Pythona (punkt 6).
+
+**9. Wniosek w jednym zdaniu:** *Zanim włączysz batchowanie, zmierz, gdzie idzie czas. U nas batchowanie dało 3,5×,
+bo koszt modelu na GPU jest prawie stały na wywołanie. Dalej ogranicza już proces Pythona obsługujący HTTP, nie GPU.
+Kolejny krok to więcej replik, a nie większe paczki.*
+
 ## Dlaczego `best`, MPS i te dwa narzędzia
 
 * **Model `best`** ma najwyższą dokładność z trzech modeli HW1 (90,7% vs 85,5% i 77,9%) i jest największy (692 tys. parametrów),
