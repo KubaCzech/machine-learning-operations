@@ -16,3 +16,4 @@ Dane (`data/`) i modele (`models/`) leżą w katalogu głównym, żeby kolejne l
 | Lab | Temat | Polecenie | Dane | Modele |
 |---|---|---|---|---|
 | [lab1](lab1/) | PyTorch Lightning, monitoring (MLflow), HPO (Optuna) | [HOMEWORK1.md](homeworks/HOMEWORK1.md) | `data/cifar-10-batches-py` | `models/lab1/` |
+| [lab2](lab2/) | Serwowanie modelu jako API (BentoML, Ray Serve), benchmark dynamicznego batchowania | [HOMEWORK2.MD](homeworks/HOMEWORK2.MD) | `data/cifar-10-batches-py` | `models/lab1/best` → `models/lab2/` |
