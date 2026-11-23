@@ -1,0 +1,12 @@
+# Ray Serve config:   BATCHING=1 serve run ray_serve.yaml
+# (ports 8000/3000 are often taken, so the benchmark uses 8111 for Ray Serve and 3111 for BentoML)
+proxy_location: HeadOnly
+http_options:
+  host: 127.0.0.1
+  port: 8111
+logging_config:
+  enable_access_log: false   # per-request logging would be part of the measured overhead
+applications:
+  - name: cifar
+    route_prefix: /
+    import_path: ray_app:app

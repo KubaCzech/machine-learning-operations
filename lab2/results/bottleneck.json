@@ -1,0 +1,139 @@
+{
+  "under_load": [
+    {
+      "tool": "bentoml",
+      "batching": false,
+      "concurrency": 1,
+      "throughput_sps": 426.2,
+      "latency_p50_ms": 2.2971630096435547,
+      "latency_p95_ms": 2.5510787963867188,
+      "gpu_util_pct": 57.672413793103445,
+      "model_time_share": 0.764985331377517,
+      "model_ms_per_call": 1.794938986232791,
+      "mean_batch_size": 1.0,
+      "server_cpu_cores": {
+        "bentoml worker (HTTP + model)": 0.81
+      }
+    },
+    {
+      "tool": "bentoml",
+      "batching": false,
+      "concurrency": 32,
+      "throughput_sps": 450.6,
+      "latency_p50_ms": 69.52953338623047,
+      "latency_p95_ms": 72.9820728302002,
+      "gpu_util_pct": 61.224137931034484,
+      "model_time_share": 0.844423848831162,
+      "model_ms_per_call": 1.8737239236573457,
+      "mean_batch_size": 1.0,
+      "server_cpu_cores": {
+        "bentoml worker (HTTP + model)": 0.94
+      }
+    },
+    {
+      "tool": "bentoml",
+      "batching": true,
+      "concurrency": 1,
+      "throughput_sps": 412.0,
+      "latency_p50_ms": 2.384185791015625,
+      "latency_p95_ms": 2.593994140625,
+      "gpu_util_pct": 55.58620689655172,
+      "model_time_share": 0.7404240994053809,
+      "model_ms_per_call": 1.7974350675621005,
+      "mean_batch_size": 1.0,
+      "server_cpu_cores": {
+        "bentoml worker (HTTP + model)": 0.8
+      }
+    },
+    {
+      "tool": "bentoml",
+      "batching": true,
+      "concurrency": 32,
+      "throughput_sps": 1607.1333333333334,
+      "latency_p50_ms": 17.882823944091797,
+      "latency_p95_ms": 23.36796522140503,
+      "gpu_util_pct": 35.775862068965516,
+      "model_time_share": 0.38156192914383247,
+      "model_ms_per_call": 4.702711585866886,
+      "mean_batch_size": 19.808,
+      "server_cpu_cores": {
+        "bentoml worker (HTTP + model)": 0.77
+      }
+    },
+    {
+      "tool": "ray",
+      "batching": false,
+      "concurrency": 1,
+      "throughput_sps": 223.96666666666667,
+      "latency_p50_ms": 4.377841949462891,
+      "latency_p95_ms": 5.207347869873045,
+      "gpu_util_pct": 32.06896551724138,
+      "model_time_share": 0.517558977162496,
+      "model_ms_per_call": 2.3107902961750257,
+      "mean_batch_size": 1.0,
+      "server_cpu_cores": {
+        "other": 0.04,
+        "ray replica (model)": 0.65,
+        "ray proxy (HTTP)": 0.36
+      }
+    },
+    {
+      "tool": "ray",
+      "batching": false,
+      "concurrency": 32,
+      "throughput_sps": 464.56666666666666,
+      "latency_p50_ms": 68.66192817687988,
+      "latency_p95_ms": 71.57459259033203,
+      "gpu_util_pct": 59.3448275862069,
+      "model_time_share": 0.9804520952993689,
+      "model_ms_per_call": 2.1104836394948334,
+      "mean_batch_size": 1.0,
+      "server_cpu_cores": {
+        "other": 0.05,
+        "ray replica (model)": 1.48,
+        "ray proxy (HTTP)": 0.78
+      }
+    },
+    {
+      "tool": "ray",
+      "batching": true,
+      "concurrency": 1,
+      "throughput_sps": 83.76666666666667,
+      "latency_p50_ms": 11.875152587890625,
+      "latency_p95_ms": 13.074398040771484,
+      "gpu_util_pct": 14.385964912280702,
+      "model_time_share": 0.27074762803288416,
+      "model_ms_per_call": 3.2330414012738853,
+      "mean_batch_size": 1.0,
+      "server_cpu_cores": {
+        "other": 0.05,
+        "ray proxy (HTTP)": 0.19,
+        "ray replica (model)": 0.37
+      }
+    },
+    {
+      "tool": "ray",
+      "batching": true,
+      "concurrency": 32,
+      "throughput_sps": 898.7333333333333,
+      "latency_p50_ms": 35.6980562210083,
+      "latency_p95_ms": 44.546985626220696,
+      "gpu_util_pct": 41.293103448275865,
+      "model_time_share": 0.5270544222677168,
+      "model_ms_per_call": 5.363793688496776,
+      "mean_batch_size": 9.142,
+      "server_cpu_cores": {
+        "other": 0.07,
+        "ray proxy (HTTP)": 1.53,
+        "ray replica (model)": 1.62
+      }
+    }
+  ],
+  "per_request_costs": {
+    "json_parse_ms": 0.0036060665966942906,
+    "base64_decode_ms": 0.0056054915999993685,
+    "model_batch1_ms": 1.898961526652177,
+    "model_batch64_ms": 6.413984590035398,
+    "full_predict_batch1_ms": 1.6872954165834624
+  }
+}
